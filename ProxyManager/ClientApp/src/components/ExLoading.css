@@ -1,0 +1,23 @@
+@keyframes fade-in {  
+    0% {opacity: 0;}/*初始状态 透明度为0*/  
+    100% {opacity: 1;}/*结束状态 透明度为1*/  
+}  
+@-webkit-keyframes fade-in {/*针对webkit内核*/  
+    0% {opacity: 0;}  
+    100% {opacity: 1;}  
+}
+
+#exloading{
+    animation: fade-in;/*动画名称*/  
+    animation-duration: .2s;/*动画持续时间*/  
+}
+#exloading .mask{
+    display: flex;
+    height: 100%;
+}
+
+#exloading .mask-loading{
+    margin:auto!important;
+    font-size: 18px;
+    color:lightgrey;
+}

@@ -1,0 +1,37 @@
+#main-page{
+    min-height: 100vh;
+}
+
+#main-page .main-sider{
+    box-shadow: 2px 0 6px rgba(0,21,41,.35);
+}
+#main-page .logo{
+    height: 60px;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    line-height: 60px;
+}
+#main-page .full-logo{
+    width: 256px;
+}
+
+@keyframes fade-in {  
+    0% {opacity: 0;}/*初始状态 透明度为0*/  
+    100% {opacity: 1;}/*结束状态 透明度为1*/  
+}  
+@-webkit-keyframes fade-in {/*针对webkit内核*/  
+    0% {opacity: 0;}  
+    100% {opacity: 1;}  
+}
+#main-page .fade-in {    
+    animation: fade-in;/*动画名称*/  
+    animation-duration: .5s;/*动画持续时间*/  
+    -webkit-animation:fade-in .5s;/*针对webkit内核*/  
+}
+.site-layout .site-layout-background {
+    background: #fff;
+}
+.site-layout .site-layout-background {
+    background: #fff;
+}
