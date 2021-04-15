@@ -58,6 +58,7 @@ class NodeManager extends React.Component {
                             <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>状态 :</div>{item.state}</div>
                             <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>IP :</div>{item.ip}</div>
                             <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>端口 :</div>{item.port}</div>
+                            <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>位置 :</div>{item.location}</div>
                             <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>获取次数 :</div>{item.use_count}</div>
                             <div style={{ display: "flex" }}><div style={{ width: "30%", textAlign: "right", marginRight: 10 }}>上次心跳 :</div>{this.getFormatDate(item.lastHBDate)}</div>
                         </Card>

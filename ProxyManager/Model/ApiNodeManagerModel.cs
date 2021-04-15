@@ -15,6 +15,7 @@ namespace ProxyManager.Model
             public string ip { get; set; }
             public int port { get; set; }
             public DateTime lastHBDate { get; set; }
+            public DateTime lastRedialDate { get; set; }
             public string state { get; set; }
             public long use_count { get; set; }
         }

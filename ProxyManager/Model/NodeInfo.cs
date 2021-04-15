@@ -14,6 +14,7 @@ namespace ProxyManager.Model
         public string location { get; set; }
         public string state { get; set; }
         public DateTime lastHBDate { get; set; }
+        public DateTime lastRedialDate { get; set; }
         public string api_ip { get; set; }
         public int api_port { get; set; }
         public long use_count { get; set; }
@@ -29,7 +30,8 @@ namespace ProxyManager.Model
                 port = this.port,
                 lastHBDate = this.lastHBDate,
                 state = this.state,
-                use_count=this.use_count
+                use_count=this.use_count,
+                lastRedialDate=this.lastRedialDate
             };
         }
     }

@@ -15,7 +15,8 @@ namespace ProxyManager.Core
         private HttpClient Http;
         private Thread MainThread;
         private object locker;
-        private DateTime NextRedialDate = DateTime.Now;
+        private int RedialInterval = 99999;
+        private bool EnableAutoRedial = false;
         private DateTime NextCheckDate = DateTime.Now;
         private IConfiguration Config;
         private NodePool(IConfiguration _config)
@@ -25,6 +26,7 @@ namespace ProxyManager.Core
             Http = new HttpClient();
             MainThread = new Thread(new ThreadStart(Work));
             locker = new object();
+            this.UpdateRedialInterval();
             MainThread.Start();
         }
         public NodeInfo AddOrUpdate(ApiNodeManagerModel.NodeInfo info)
@@ -73,6 +75,7 @@ namespace ProxyManager.Core
                 {
                     return false;
                 }
+                node.lastRedialDate = DateTime.Now;
                 node.state = "redial";
                 node.actionTask.Enqueue("redial");
                 return true;
@@ -86,13 +89,8 @@ namespace ProxyManager.Core
                 var now = DateTime.Now;
                 foreach (var node in this.Nodes)
                 {
-                    if (node.actionTask.Count == 0)
-                    {
-                        node.actionTask.Enqueue("redial");
-                    }
+                    this.ReDialNode(node.id);
                 }
-                var interval = this.Config.GetSection("MainConfig").GetValue<int>("RedialInterval");
-                NextRedialDate = now.AddSeconds(interval);
             }
             return true;
         }
@@ -125,30 +123,32 @@ namespace ProxyManager.Core
             }
             return result;
         }
+        public void UpdateRedialInterval()
+        {
+            RedialInterval = this.Config.GetSection("MainConfig").GetValue<int>("RedialInterval");
+            EnableAutoRedial = this.Config.GetSection("MainConfig").GetValue<bool>("AutoRedial");
+        }
         private void Work()
         {
             while (true)
             {
                 var now = DateTime.Now;
-                if (now > NextRedialDate)//定时重播
+                if (EnableAutoRedial)
                 {
-                    if (this.Config.GetSection("MainConfig").GetValue<bool>("AutoRedial"))
+                    lock (locker)
                     {
-                        lock (locker)
+                        foreach (var node in this.Nodes)
                         {
-                            foreach (var node in this.Nodes)
+                            if((now- node.lastRedialDate).TotalSeconds >= this.RedialInterval)
                             {
-                                if (node.actionTask.Count == 0)
-                                {
-                                    node.actionTask.Enqueue("redial");
-                                }
+                                this.ReDialNode(node.id);
                             }
-                            var interval = this.Config.GetSection("MainConfig").GetValue<int>("RedialInterval");
-                            NextRedialDate = now.AddSeconds(interval);
                         }
+                        //var interval = this.Config.GetSection("MainConfig").GetValue<int>("RedialInterval");
+                        //NextRedialDate = now.AddSeconds(interval);
                     }
                 }
-                if(now > NextCheckDate)
+                if (now > NextCheckDate)
                 {
                     lock (locker)
                     {
@@ -160,7 +160,7 @@ namespace ProxyManager.Core
                                 node.state = "offline";
                             }
                         }
-                        NextRedialDate = now.AddSeconds(60);
+                        NextCheckDate = now.AddSeconds(60);
                     }
                 }
                 Thread.Sleep(500);

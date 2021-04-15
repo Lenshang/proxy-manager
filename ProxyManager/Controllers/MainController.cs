@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using ProxyManager.Core;
 using ProxyManager.Model;
 using System;
 using System.Collections.Generic;
@@ -55,9 +56,16 @@ namespace ProxyManager.Controllers
         [HttpPost("save-config")]
         public IActionResult SaveConfig([FromBody]SaveConfigModel _config)
         {
+            string _oldredial = this.config.GetSection("MainConfig").GetSection("RedialInterval").Value;
+            string _oldauto = this.config.GetSection("MainConfig").GetSection("AutoRedial").Value;
             this.config.GetSection("MainConfig").GetSection("HeartInterval").Value= _config.heart_interval.ToString();
             this.config.GetSection("MainConfig").GetSection("AutoRedial").Value = _config.auto_redial.ToString();
             this.config.GetSection("MainConfig").GetSection("RedialInterval").Value = _config.redial_interval.ToString();
+
+            if(_oldredial!= _config.redial_interval.ToString() || _oldauto!= _config.auto_redial.ToString())
+            {
+                NodePool.Get().UpdateRedialInterval();
+            }
             return ApiResult.OK();
         }
     }
