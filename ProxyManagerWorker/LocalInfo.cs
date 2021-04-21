@@ -43,7 +43,7 @@ namespace ProxyManagerWorker
             this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
             this.Http.DefaultRequestHeaders.Add("Accept", "*/*");
 
-            this.RestartService();
+            //this.RestartService();
             this.TryGetIp();
             this.id = GetMd5(name);
             this.Logger.LogInformation("Try Connect Master:"+this.masterApi);
@@ -81,7 +81,7 @@ namespace ProxyManagerWorker
         {
             this.Logger.LogInformation("Try Get IpAddress");
             var t_response = this.Http.GetStringAsync("https://ip.cn/api/index?ip=&type=0");
-            t_response.Wait();
+            t_response.Wait(10000);
             var response = t_response.Result;
             var obj = JsonConvert.DeserializeObject<JToken>(response);
             this.ip = obj["ip"]?.ToString();
@@ -96,13 +96,26 @@ namespace ProxyManagerWorker
         }
         private void RedialNode()
         {
-            string cmd = this.Config.GetValue<string>("RedialCommand");
-            var msg = RunnerModule.RunProcessAndGetMessage(cmd);
-            this.Logger.LogInformation("Redial VPS:" + msg);
-            this.Http = new HttpClient();
-            this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
-            this.Http.DefaultRequestHeaders.Add("Accept", "*/*");
-            this.TryGetIp();
+            while (true)
+            {
+                try
+                {
+                    string cmd = this.Config.GetValue<string>("RedialCommand");
+                    var msg = RunnerModule.RunProcessAndGetMessage(cmd);
+                    this.Logger.LogInformation("Redial VPS:" + msg);
+                    this.Http = new HttpClient();
+                    this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
+                    this.Http.DefaultRequestHeaders.Add("Accept", "*/*");
+                    this.TryGetIp();
+                    break;
+                }
+                catch
+                {
+                    this.Logger.LogWarning("Redial Failure,Retrying...");
+                    Thread.Sleep(5000);
+                }
+            }
+
         }
         private bool Send()
         {
@@ -119,7 +132,7 @@ namespace ProxyManagerWorker
                 };
                 JsonContent content = JsonContent.Create(_param);
                 var t_response=this.Http.PostAsync(url, content);
-                t_response.Wait();
+                t_response.Wait(10000);
                 var t_str = t_response.Result.Content.ReadAsStringAsync();
                 t_str.Wait();
                 var response = t_str.Result;
@@ -144,6 +157,10 @@ namespace ProxyManagerWorker
             if (actName == "redial")
             {
                 this.RedialNode();
+            }
+            else if (actName == "get_config")
+            {
+
             }
         }
         private string GetMd5(string userPwd)

@@ -144,8 +144,6 @@ namespace ProxyManager.Core
                                 this.ReDialNode(node.id);
                             }
                         }
-                        //var interval = this.Config.GetSection("MainConfig").GetValue<int>("RedialInterval");
-                        //NextRedialDate = now.AddSeconds(interval);
                     }
                 }
                 if (now > NextCheckDate)
