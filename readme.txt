@@ -1,4 +1,4 @@
-yum install tmux libevent libicu -y
+yum install tmux libevent libicu gcc gcc-c++ -y
 
 firewall-cmd --zone=public --add-port=8787/tcp --permanent
 firewall-cmd --reload

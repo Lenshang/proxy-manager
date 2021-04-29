@@ -91,7 +91,7 @@ namespace ProxyManagerWorker
         private void RestartService()
         {
             string cmd = this.Config.GetValue<string>("RestartCommand");
-            var msg = RunnerModule.RunProcessAndGetMessage(cmd);
+            var msg = RunnerModule.RunProcessAndGetMessage(cmd, timeout: 10000);
             this.Logger.LogInformation("Restart TinyProxy:" + msg);
         }
         private void RedialNode()
@@ -100,8 +100,9 @@ namespace ProxyManagerWorker
             {
                 try
                 {
+                    this.Logger.LogInformation("Try Redial......");
                     string cmd = this.Config.GetValue<string>("RedialCommand");
-                    var msg = RunnerModule.RunProcessAndGetMessage(cmd);
+                    var msg = RunnerModule.RunProcessAndGetMessage(cmd, timeout: 10000);
                     this.Logger.LogInformation("Redial VPS:" + msg);
                     this.Http = new HttpClient();
                     this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");

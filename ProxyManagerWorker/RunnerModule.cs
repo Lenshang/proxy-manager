@@ -58,18 +58,18 @@ public class RunnerModule
     /// <summary>
     /// 启动程序并等待结束
     /// </summary>
-    public void RunAndWait()
+    public void RunAndWait(int timeout=1000*15)
     {
         Run();
-        this.process.WaitForExit();
+        this.process.WaitForExit(timeout);
     }
     /// <summary>
     /// 启动程序并等待程序结束并返回打印信息
     /// </summary>
     /// <returns></returns>
-    public string RunAndWaitReturn()
+    public string RunAndWaitReturn(int timeout = 1000 * 15)
     {
-        RunAndWait();
+        RunAndWait(timeout);
         return GetMessage();
     }
     /// <summary>
@@ -130,12 +130,12 @@ public class RunnerModule
     /// <param name="program"></param>
     /// <param name="arguments"></param>
     /// <returns></returns>
-    public static string RunProcessAndGetMessage(string program, string arguments)
+    public static string RunProcessAndGetMessage(string program, string arguments,int timeout=1000*15)
     {
         try
         {
             RunnerModule p = new RunnerModule(program, arguments);
-            return p.RunAndWaitReturn();
+            return p.RunAndWaitReturn(timeout);
         }
         catch (Exception ex)
         {
@@ -149,16 +149,16 @@ public class RunnerModule
     /// <param name="program"></param>
     /// <param name="arguments"></param>
     /// <returns></returns>
-    public static string RunProcessAndGetMessage(string program)
+    public static string RunProcessAndGetMessage(string program,int timeout=1000*15)
     {
         if(program.Contains(" ")){
             string _p = program.Substring(0, program.IndexOf(" "));
             string _a = program.Substring(program.IndexOf(" ") + 1);
-            return RunProcessAndGetMessage(_p, _a);
+            return RunProcessAndGetMessage(_p, _a,timeout);
         }
         else
         {
-            return RunProcessAndGetMessage(program, "");
+            return RunProcessAndGetMessage(program, "",timeout);
         }
     }
     /// <summary>
