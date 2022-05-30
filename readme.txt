@@ -17,8 +17,10 @@ tinyproxy -v
 find / -name tinyproxy.conf
 
 vi /etc/tinyproxy/tinyproxy.conf
+（vi /usr/local/etc/tinyproxy/tinyproxy.conf）
 修改Port 8787
 注释 #Allow 127.0.0.1
 
 tinyproxy -c /etc/tinyproxy/tinyproxy.conf
+(tinyproxy -c /usr/local/etc/tinyproxy/tinyproxy.conf)
 ps -ef|grep tinyproxy|grep -v grep|awk '{print "kill -9 "$2}'|sh

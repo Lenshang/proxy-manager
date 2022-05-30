@@ -11,6 +11,11 @@ namespace ProxyManagerWorker
 {
     class MyLogger : ILogger
     {
+        private readonly NLog.Logger Logger;
+        public MyLogger()
+        {
+            this.Logger = NLog.LogManager.GetCurrentClassLogger();
+        }
         public IDisposable BeginScope<TState>(TState state)
         {
             return null;
@@ -23,7 +28,31 @@ namespace ProxyManagerWorker
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            Console.WriteLine(formatter(state,exception));
+            switch (logLevel)
+            {
+                case LogLevel.Debug:
+                    this.Logger.Debug(formatter(state, exception));
+                    break;
+                case LogLevel.Information:
+                    this.Logger.Info(formatter(state, exception));
+                    break;
+                case LogLevel.Warning:
+                    this.Logger.Warn(formatter(state, exception));
+                    break;
+                case LogLevel.Error:
+                    this.Logger.Error(formatter(state, exception));
+                    break;
+                case LogLevel.Critical:
+                    this.Logger.Warn(formatter(state, exception));
+                    break;
+                case LogLevel.Trace:
+                    this.Logger.Trace(formatter(state, exception));
+                    break;
+                default:
+                    this.Logger.Info(formatter(state, exception));
+                    break;
+            }
+            //Console.WriteLine(formatter(state,exception));
         }
     }
     public class Program

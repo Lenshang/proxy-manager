@@ -24,6 +24,10 @@ namespace ProxyManager.Controllers
         [HttpPost("receive")]
         public IActionResult ReceiveNodeInfo([FromBody]ApiNodeManagerModel.NodeInfo info)
         {
+            if (info.auth != this.config.GetValue<string>("MasterAuth"))
+            {
+                return ApiResult.Failure("bad auth key");
+            }
             var node=NodePool.Get().AddOrUpdate(info);
             int interval= Convert.ToInt32(this.config.GetSection("MainConfig").GetValue<string>("HeartInterval"));
             var next_beat=DateTime.Now.AddSeconds(interval);
@@ -38,6 +42,12 @@ namespace ProxyManager.Controllers
             }
 
             return ApiResult.OK(result);
+        }
+        [HttpGet("ip")]
+        public string GetIp()
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4()?.ToString();
+            return ip;
         }
     }
 }

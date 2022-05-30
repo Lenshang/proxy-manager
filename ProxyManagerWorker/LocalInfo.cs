@@ -40,9 +40,9 @@ namespace ProxyManagerWorker
             //HttpClientHandler handler = new HttpClientHandler();
             //handler.Proxy = new WebProxy("http://127.0.0.1:8888");
             this.Http = new HttpClient();
-            this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
-            this.Http.DefaultRequestHeaders.Add("Accept", "*/*");
-
+            //this.Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
+            //this.Http.DefaultRequestHeaders.Add("Accept", "*/*");
+            this.Http.Timeout = TimeSpan.FromSeconds(10000);
             //this.RestartService();
             this.TryGetIp();
             this.id = GetMd5(name);
@@ -80,12 +80,15 @@ namespace ProxyManagerWorker
         private void TryGetIp()
         {
             this.Logger.LogInformation("Try Get IpAddress");
-            var t_response = this.Http.GetStringAsync("https://ip.cn/api/index?ip=&type=0");
-            t_response.Wait(10000);
+            var t_response = this.Http.GetStringAsync(new Uri(new Uri(this.masterApi), "/api/server/ip").ToString());
+            if (!t_response.Wait(10000))
+            {
+                throw new Exception("Get IPADDRESS FAILURE!");
+            }
             var response = t_response.Result;
-            var obj = JsonConvert.DeserializeObject<JToken>(response);
-            this.ip = obj["ip"]?.ToString();
-            this.location = obj["address"]?.ToString();
+            //var obj = JsonConvert.DeserializeObject<JToken>(response);
+            this.ip = response;
+            this.location = "unknown";
             this.Logger.LogInformation($"Get IP:{this.ip} Location:{this.location}");
         }
         private void RestartService()
@@ -129,7 +132,8 @@ namespace ProxyManagerWorker
                     location=this.location,
                     ip=this.ip,
                     port=this.port,
-                    state=this.state
+                    state=this.state,
+                    auth= this.Config.GetValue<string>("MasterAuth")
                 };
                 JsonContent content = JsonContent.Create(_param);
                 var t_response=this.Http.PostAsync(url, content);

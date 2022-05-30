@@ -18,6 +18,7 @@ namespace ProxyManager.Model
             public DateTime lastRedialDate { get; set; }
             public string state { get; set; }
             public long use_count { get; set; }
+            public string auth { get; set; }
         }
     }
 }
